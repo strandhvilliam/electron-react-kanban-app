@@ -1,0 +1,43 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Task {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  priority    String   @default("standard")
+  orderIndex  Int
+  Column      Column   @relation("Tasks", fields: [columnId], references: [id], onDelete: Cascade)
+  columnId    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Column {
+  id         String   @id @default(uuid())
+  title      String
+  tasks      Task[]   @relation("Tasks")
+  orderIndex Int
+  Board      Board?   @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  boardId    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Board {
+  id         String   @id @default(uuid())
+  title      String
+  columns    Column[]
+  orderIndex Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
