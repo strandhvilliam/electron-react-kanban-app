@@ -6,6 +6,9 @@ import {
 	createBoard,
 	createColumn,
 	createTask,
+	deleteBoard,
+	deleteColumn,
+	deleteTask,
 	devClearAllBoards,
 	devClearAllColumns,
 	findAllBoards,
@@ -181,6 +184,18 @@ ipcMain.handle(
 ipcMain.handle(
 	"update-task",
 	async (_, task: UpdateTask) => await updateTask(task)
+);
+ipcMain.handle(
+	"delete-task",
+	async (_, taskId: string) => await deleteTask(taskId)
+);
+ipcMain.handle(
+	"delete-column",
+	async (_, columnId: string) => await deleteColumn(columnId)
+);
+ipcMain.handle(
+	"delete-board",
+	async (_, boardId: string) => await deleteBoard(boardId)
 );
 
 ipcMain.handle("find-all-boards", async () => await findAllBoards());

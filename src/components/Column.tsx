@@ -15,6 +15,7 @@ import OutlineButton from "./OutlineButton";
 import BoardContext from "@/providers/board-context";
 import { createPortal } from "react-dom";
 import useOutsideClick from "@/hooks/useOutsideClick";
+import ColumnMenu from "./ColumnMenu";
 
 interface ColumnProps {
 	column: ColumnModel;
@@ -44,6 +45,12 @@ const Column = ({ column, index }: ColumnProps) => {
 		setIsEditingTitle(false);
 	};
 
+	const handleDeleteColumn = () => {
+		if (confirm("Are you sure you want to delete this column?")) {
+			// updateColumn({ ...column, isDeleted: true });
+		}
+	};
+
 	useOutsideClick([menuRef, menuBtnRef], () => setMenuIsOpen(false));
 
 	return (
@@ -69,6 +76,7 @@ const Column = ({ column, index }: ColumnProps) => {
 							<input
 								type="text"
 								autoFocus
+								spellCheck={false}
 								className="text-slate-100 text-xl bg-slate-900 outline-0"
 								value={title}
 								onChange={(e) => setTitle(e.target.value)}
@@ -87,73 +95,13 @@ const Column = ({ column, index }: ColumnProps) => {
 						</IconButton>
 					</div>
 					{menuIsOpen && (
-						<div
-							ref={menuRef}
-							className="flex flex-col absolute top-10 w-max left-[280px] bg-slate-900 border border-slate-700 text-slate-300 py-4 z-40 rounded-lg shadow-md shadow-slate-900"
-						>
-							<ul>
-								<li className="px-4 py-1 hover:bg-slate-800 select-none cursor-default">
-									Add new Task
-								</li>
-								<li className="px-4 py-1 hover:bg-slate-800 select-none cursor-default">
-									Edit task
-								</li>
-
-								<li className="px-4 py-1 hover:bg-slate-800 select-none cursor-default">
-									Delete
-								</li>
-							</ul>
-							<p className="border-t px-4 py-2 mt-2 text-slate-500 text-sm font-bold border-slate-700">
-								Sort
-							</p>
-							<ul>
-								<li className="px-4 py-1 hover:bg-slate-800 select-none cursor-default">
-									Sort by date
-								</li>
-								<li className="px-4 py-1 hover:bg-slate-800 select-none cursor-default">
-									Sort by category
-								</li>
-								<li className="px-4 py-1 hover:bg-slate-800 select-none cursor-default">
-									Sort by priority
-								</li>
-								<li className="px-4 py-1 hover:bg-slate-800 select-none cursor-default">
-									Sort alpabetically
-								</li>
-							</ul>
-							<p className="border-t py-2 px-4 mt-2 text-slate-500 text-sm font-bold border-slate-700">
-								Filter
-							</p>
-							<ul>
-								<li className="flex items-center gap-2 px-4 py-1 hover:bg-slate-800 select-none cursor-default">
-									<img
-										className="w-4 h-4"
-										src="/fire.png"
-									></img>
-									Show only priority High
-								</li>
-								<li className="flex items-center gap-2 px-4 py-1 hover:bg-slate-800 select-none cursor-default">
-									<img
-										className="w-4 h-4"
-										src="/moon.png"
-									></img>
-									Show only priority Standard
-								</li>
-								<li className="flex items-center gap-2 px-4 py-1 hover:bg-slate-800 select-none cursor-default">
-									<img
-										className="w-4 h-4"
-										src="/leaf.png"
-									></img>
-									Show only priority Low
-								</li>
-							</ul>
-						</div>
+						<ColumnMenu columnId={column.id} ref={menuRef} />
 					)}
 
 					<Droppable droppableId={column.id} type="task">
 						{(provided, snapshot) => (
-							<div className="flex overflow-y-hidden  flex-col">
+							<div className="flex overflow-y-hidden flex-col">
 								<ul
-									{...provided.droppableProps}
 									{...provided.droppableProps}
 									ref={provided.innerRef}
 									className="flex flex-col h-full p-2 bg-slate-900 border-t border-slate-700 rounded-b-xl overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-thumb-rounded-md "

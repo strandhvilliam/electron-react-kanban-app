@@ -111,18 +111,22 @@ contextBridge.exposeInMainWorld("api", {
 
 	createBoard: (board: CreateBoard) =>
 		ipcRenderer.invoke("create-board", board),
+	createColumn: (column: CreateColumn) =>
+		ipcRenderer.invoke("create-column", column),
+	createTask: (task: CreateTask) => ipcRenderer.invoke("create-task", task),
 	updateBoard: (board: UpdateBoard) =>
 		ipcRenderer.invoke("update-board", board),
 	updateColumn: async (column: UpdateColumn) =>
 		await ipcRenderer.invoke("update-column", column),
 	updateTask: async (task: UpdateTask) =>
 		await ipcRenderer.invoke("update-task", task),
+	deleteColumn: async (id: string) =>
+		await ipcRenderer.invoke("delete-column", id),
+	deleteTask: async (id: string) =>
+		await ipcRenderer.invoke("delete-task", id),
 
 	findAllBoards: () => ipcRenderer.invoke("find-all-boards"),
 	findBoardById: (id: string) => ipcRenderer.invoke("find-board-by-id", id),
-	createColumn: (column: CreateColumn) =>
-		ipcRenderer.invoke("create-column", column),
-	createTask: (task: CreateTask) => ipcRenderer.invoke("create-task", task),
 });
 
 contextBridge.exposeInMainWorld("dev", {

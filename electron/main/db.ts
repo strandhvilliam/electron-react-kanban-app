@@ -137,6 +137,20 @@ export const updateTask = async (task: UpdateTask) => {
 	});
 };
 
+export const deleteTask = async (taskId: string) => {
+	await prisma.task.delete({ where: { id: taskId } });
+};
+
+export const deleteColumn = async (columnId: string) => {
+	await prisma.column.delete({ where: { id: columnId } });
+};
+
+export const deleteBoard = async (boardId: string) => {
+	await prisma.board.delete({ where: { id: boardId } });
+};
+
+
+
 export const devClearAllBoards = async () => {
 	return await prisma.board.deleteMany();
 };

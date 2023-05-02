@@ -1,6 +1,6 @@
 import RootLayout from "./components/RootLayout";
 import Board from "./components/Board";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import BoardProvider from "./providers/BoardProvider";
 // import { test } from "electron/preload";
 // import { ipcRenderer } from "electron";
@@ -31,13 +31,12 @@ const INITIAL_DATA: any = {
 		}, */
 	],
 
+
 	columnOrder: ["startCol-1", "startCol-2", "startCol-3"],
 };
 
 function App() {
-	const handleClick = (msg: string) => {
-		// window.api.send("test", { message: msg });
-	};
+	
 
 	return (
 		<BoardProvider>

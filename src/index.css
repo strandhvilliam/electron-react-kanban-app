@@ -2,8 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
+@layer components {
     .draggable-bar {
         -webkit-app-region: drag;
+    }
+}
+
+@layer utilities {
+    .max-z-index {
+        z-index: 2147483647;
     }
 }

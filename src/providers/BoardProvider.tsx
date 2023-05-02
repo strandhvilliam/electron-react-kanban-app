@@ -53,6 +53,51 @@ const BoardProvider = memo(({ children }: BoardProviderProps) => {
 		});
 	};
 
+	const deleteBoard = async (boardId: string) => {
+		await window.api.deleteBoard(boardId);
+		setBoards((prev) => prev.filter((b) => b.id !== boardId));
+		setSelectedBoard(null);
+	};
+
+	const deleteColumn = async (columnId: string) => {
+		if (!selectedBoard) return;
+
+		await window.api.deleteColumn(columnId);
+
+		const newBoard: BoardModel = {
+			...selectedBoard!,
+			columns: selectedBoard!.columns.filter((c) => c.id !== columnId),
+		};
+
+		loadBoard(newBoard);
+	};
+
+	const deleteTask = async (columnId: string, taskId: string) => {
+		if (!selectedBoard) return;
+
+		await window.api.deleteTask(taskId);
+
+		const targetColumn = selectedBoard.columns.find(
+			(c) => c.id === columnId
+		);
+
+		if (!targetColumn) return;
+
+		const newColumn: ColumnModel = {
+			...targetColumn,
+			tasks: targetColumn.tasks.filter((t) => t.id !== taskId),
+		};
+
+		const newBoard: BoardModel = {
+			...selectedBoard,
+			columns: selectedBoard.columns.map((c) =>
+				c.id === columnId ? newColumn : c
+			),
+		};
+
+		loadBoard(newBoard);
+	};
+
 	const loadColumn = async (column: ColumnModel) => {
 		setBoards((prev) =>
 			prev.map((b) =>
@@ -150,6 +195,9 @@ const BoardProvider = memo(({ children }: BoardProviderProps) => {
 				updateBoard,
 				updateColumn,
 				updateTask,
+				deleteBoard,
+				deleteColumn,
+				deleteTask,
 				loadColumn,
 				loadBoard,
 			}}
