@@ -11,8 +11,7 @@ import {
 import OutlineButton from "./OutlineButton";
 import { useContext, useEffect } from "react";
 import BoardContext from "@/providers/board-context";
-import { ColumnModel } from "@/shared/types";
-import { updateTask } from "electron/main/db";
+import { ColumnModel, TaskModel } from "@/shared/types";
 
 const Board = () => {
 	const {
@@ -21,12 +20,77 @@ const Board = () => {
 		createColumn,
 		updateBoard,
 		updateColumn,
+		updateTask,
+		loadColumn,
 	} = useContext(BoardContext);
-
-	console.log(selectedBoard?.columns);
 
 	const handleCreateColumn = (input: string) => {
 		createColumn(input);
+	};
+
+	const moveTaskWithinColumn = async (
+		col: ColumnModel,
+		sourceIndex: number,
+		destIndex: number,
+		task: TaskModel
+	) => {
+		const newTasks = Array.from(col.tasks);
+
+		newTasks.splice(sourceIndex, 1);
+		newTasks.splice(destIndex, 0, task!);
+
+		const newCol: ColumnModel = {
+			...col,
+			tasks: newTasks,
+		};
+
+		await loadColumn(newCol);
+
+		for (const t of newTasks) {
+			await updateTask(col, {
+				...t,
+				orderIndex: newTasks.indexOf(t),
+			});
+		}
+	};
+
+	const moveTaskBetweenColumns = async (
+		startCol: ColumnModel,
+		endCol: ColumnModel,
+		sourceIndex: number,
+		destIndex: number,
+		task: TaskModel
+	) => {
+		const startColTasks = Array.from(startCol.tasks);
+		startColTasks.splice(sourceIndex, 1);
+		const newStartCol: ColumnModel = {
+			...startCol,
+			tasks: startColTasks,
+		};
+
+		const endColTasks = Array.from(endCol.tasks);
+		endColTasks.splice(destIndex, 0, task!);
+		const newEndCol: ColumnModel = {
+			...endCol,
+			tasks: endColTasks,
+		};
+
+		await loadColumn(newStartCol);
+		await loadColumn(newEndCol);
+
+		for (const t of startColTasks) {
+			await updateTask(newStartCol, {
+				...t,
+				orderIndex: startColTasks.indexOf(t),
+			});
+		}
+
+		for (const t of endColTasks) {
+			await updateTask(newEndCol, {
+				...t,
+				orderIndex: endColTasks.indexOf(t),
+			});
+		}
 	};
 
 	const onDragEnd = async (result: DropResult) => {
@@ -54,37 +118,26 @@ const Board = () => {
 			);
 
 			if (!startCol || !endCol) return;
+
 			const task = startCol.tasks.find((task) => task.id === draggableId);
 
+			if (!task) return;
+
 			if (startCol === endCol) {
-				const newTasks = Array.from(startCol.tasks);
-
-				newTasks.splice(source.index, 1);
-				newTasks.splice(destination.index, 0, task!);
-
-				const newCol: ColumnModel = {
-					...startCol,
-					tasks: newTasks,
-				};
-
-				updateColumn(newCol);
+				await moveTaskWithinColumn(
+					startCol,
+					source.index,
+					destination.index,
+					task
+				);
 			} else {
-				const startColTasks = Array.from(startCol.tasks);
-				startColTasks.splice(source.index, 1);
-				const newStartCol: ColumnModel = {
-					...startCol,
-					tasks: startColTasks,
-				};
-
-				const endColTasks = Array.from(endCol.tasks);
-				endColTasks.splice(destination.index, 0, task!);
-				const newEndCol: ColumnModel = {
-					...endCol,
-					tasks: endColTasks,
-				};
-
-				await updateColumn(newStartCol);
-				await updateColumn(newEndCol);
+				await moveTaskBetweenColumns(
+					startCol,
+					endCol,
+					source.index,
+					destination.index,
+					task
+				);
 			}
 		}
 	};
@@ -127,7 +180,7 @@ const Board = () => {
 								</div>
 								<OutlineButton
 									onClick={handleCreateColumn}
-									className="w-64 h-min"
+									className="w-64 h-min flex-shrink-0"
 								>
 									<FontAwesomeIcon
 										icon={faPlus}

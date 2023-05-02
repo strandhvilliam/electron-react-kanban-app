@@ -3,7 +3,7 @@ export interface TaskModel {
 	title: string;
 	description?: string;
 	priority: string;
-	// orderIndex: number;
+	orderIndex: number;
 	createdAt: Date;
 	updatedAt: Date;
 }

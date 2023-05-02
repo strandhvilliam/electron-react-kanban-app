@@ -1,44 +1,41 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, memo, useEffect, useState } from "react";
 import BoardContext from "./board-context";
-import { BoardModel, ColumnModel } from "@/shared/types";
+import { BoardModel, ColumnModel, TaskModel } from "@/shared/types";
 import { updateColumn } from "electron/main/db";
 
 interface BoardProviderProps {
 	children: ReactNode;
 }
 
-const BoardProvider = ({ children }: BoardProviderProps) => {
+const BoardProvider = memo(({ children }: BoardProviderProps) => {
 	const [boards, setBoards] = useState<BoardModel[]>([]);
 	const [selectedBoard, setSelectedBoard] = useState<BoardModel | null>(null);
 
-	const selectBoard = async (id: string) => {
+	const selectBoard = (id: string) => {
 		const board = boards.find((b) => b.id === id);
-		if (board) {
-			setSelectedBoard(board);
-		}
+		if (!board) return;
+		setSelectedBoard(board);
 	};
 
 	const createBoard = async (title: string) => {
-		const board = {
+		const orderIndex = boards.length || 0;
+
+		const resBoard: BoardModel = await window.api.createBoard({
 			title,
-			orderIndex: boards.length || 0,
-		};
-
-		const resBoard: BoardModel = await window.api.createBoard(board);
-
-		console.log(resBoard);
+			orderIndex,
+		});
 
 		setBoards((prev) => [...prev, resBoard]);
 		selectBoard(resBoard.id);
 	};
 
 	const updateBoard = async (board: BoardModel) => {
-		const updateBoard = {
-			...board,
-			orderIndex: boards.indexOf(board),
-		};
+		const orderIndex = boards.indexOf(board);
 
-		const resBoard: BoardModel = await window.api.updateBoard(updateBoard);
+		const resBoard: BoardModel = await window.api.updateBoard({
+			...board,
+			orderIndex,
+		});
 		setBoards((prev) =>
 			prev.map((b) => (b.id === resBoard.id ? resBoard : b))
 		);
@@ -46,16 +43,14 @@ const BoardProvider = ({ children }: BoardProviderProps) => {
 	};
 
 	const updateColumn = async (column: ColumnModel) => {
-		const updateColumn = {
+		/* const updateColumn = {
 			id: column.id,
 			title: column.title,
-			orderIndex:
-				selectedBoard?.columns.findIndex((c) => c.id === column.id) ||
-				0,
-		};
+		}; */
+		// await window.api.updateColumn(updateColumn);
+	};
 
-		await window.api.updateColumn(updateColumn);
-
+	const loadColumn = async (column: ColumnModel) => {
 		setBoards((prev) =>
 			prev.map((b) =>
 				b.id === selectedBoard!.id
@@ -78,6 +73,16 @@ const BoardProvider = ({ children }: BoardProviderProps) => {
 				),
 			};
 		});
+	};
+
+	const updateTask = async (column: ColumnModel, task: TaskModel) => {
+		const updateTask = {
+			id: task.id,
+			orderIndex: task.orderIndex,
+			columnId: column.id,
+		};
+
+		await window.api.updateTask(updateTask);
 	};
 
 	const createColumn = async (title: string) => {
@@ -116,51 +121,17 @@ const BoardProvider = ({ children }: BoardProviderProps) => {
 			(c) => c.id === columnId
 		);
 		if (!targetColumn) return;
-
 		const taskIndex = targetColumn.tasks.length || 0;
-		const task = {
+		await window.api.createTask({
 			title,
 			orderIndex: taskIndex,
 			columnId,
-		};
-
-		console.log(task);
-
-		const resTask = await window.api.createTask(task);
-
-		setBoards((prev) =>
-			prev.map((b) =>
-				b.id === selectedBoard.id
-					? {
-							...b,
-							columns: b.columns.map((c) =>
-								c.id === columnId
-									? { ...c, tasks: [...c.tasks, resTask] }
-									: c
-							),
-					  }
-					: b
-			)
-		);
-
-		setSelectedBoard((prev) => {
-			if (!prev) return null;
-			return {
-				...prev,
-				columns: prev.columns.map((c) =>
-					c.id === columnId
-						? { ...c, tasks: [...c.tasks, resTask] }
-						: c
-				),
-			};
 		});
 	};
 
 	useEffect(() => {
 		const fetchBoards = async () => {
 			const result: BoardModel[] = await window.api.findAllBoards();
-			console.log(result);
-
 			setBoards(result);
 			setSelectedBoard(result[0]);
 		};
@@ -178,11 +149,13 @@ const BoardProvider = ({ children }: BoardProviderProps) => {
 				createBoard,
 				updateBoard,
 				updateColumn,
+				updateTask,
+				loadColumn,
 			}}
 		>
 			{children}
 		</BoardContext.Provider>
 	);
-};
+});
 
 export default BoardProvider;

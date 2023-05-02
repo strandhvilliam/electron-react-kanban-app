@@ -11,6 +11,8 @@ interface ContextType {
     createBoard: (title: string) => void;
     updateBoard: (board: BoardModel) => void;
     updateColumn: (column: ColumnModel) => void;
+    updateTask: (column: ColumnModel, task: any) => void;
+    loadColumn: (column: ColumnModel) => void;
 }
 
 const BoardContext = createContext<ContextType>({
@@ -22,6 +24,8 @@ const BoardContext = createContext<ContextType>({
     createBoard: () => {},
     updateBoard: () => {},
     updateColumn: () => {},
+    updateTask: () => {},
+    loadColumn: () => {},
 });
 
 export default BoardContext;
