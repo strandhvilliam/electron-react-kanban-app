@@ -26,23 +26,11 @@ const Column = ({ column, index }: ColumnProps) => {
 		useContext(BoardContext);
 	const [isEditingTitle, setIsEditingTitle] = useState(false);
 	const [title, setTitle] = useState(column.title);
-	// const inputRef = useRef<HTMLInputElement>(null);
-
-	// const column = selectedBoard?.columns.find((c) => c.id === id);
 
 	const toggleEditTitle = () => {
-		// document.addEventListener("click", handleOutsideClick, false);
 		setIsEditingTitle(true);
 	};
 
-	/* const handleOutsideClick = (e: MouseEvent) => {
-		if (inputRef.current && inputRef.current.contains(e.target as Node)) {
-			return;
-		}
-		handleEditTitle();
-		setIsEditingTitle(false);
-		document.removeEventListener("click", handleOutsideClick, false);
-	}; */
 
 	const handleCreateTask = async (input: string) => {
 		createTask(column.id, input);
@@ -87,7 +75,7 @@ const Column = ({ column, index }: ColumnProps) => {
 								onKeyDown={(e) => {e.key == "Enter" && handleEditTitle()}}
 							/>
 						)}
-						<IconButton className="shadow-none bg-slate-900 hover:bg-slate-800">
+						<IconButton onClick={() => {}} className="shadow-none bg-slate-900 hover:bg-slate-800">
 							<FontAwesomeIcon icon={faEllipsis} />
 						</IconButton>
 					</div>
@@ -106,6 +94,7 @@ const Column = ({ column, index }: ColumnProps) => {
 											key={task.id}
 											task={task}
 											index={index}
+											columnId={column.id}
 										/>
 									))}
 

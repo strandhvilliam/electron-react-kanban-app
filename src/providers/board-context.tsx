@@ -11,7 +11,7 @@ interface ContextType {
     createBoard: (title: string) => void;
     updateBoard: (board: BoardModel) => void;
     updateColumn: (column: ColumnModel) => void;
-    updateTask: (column: ColumnModel, task: any) => void;
+    updateTask: (columnId: string, task: any) => void;
     loadColumn: (column: ColumnModel) => void;
     loadBoard: (board: BoardModel) => void;
 }

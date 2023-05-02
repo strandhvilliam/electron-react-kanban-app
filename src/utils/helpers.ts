@@ -5,13 +5,17 @@ export const convertDate = (date: Date) => {
 
 	if (
 		date.getDate() == new Date().getDate() &&
-		date.getTime() - new Date().getTime() < 1000 * 60 * 60
+		new Date().getHours() === date.getHours()
 	) {
-		return `${new Date().getMinutes() - date.getMinutes()} minutes ago`;
+		return `${Math.abs(
+			new Date().getMinutes() - date.getMinutes()
+		)} minutes ago`;
 	}
 
 	if (date.getDate == new Date().getDate) {
-		return `${new Date().getHours() - date.getHours()}  hours ago`;
+		return `${Math.abs(
+			new Date().getHours() - date.getHours()
+		)}  hours ago`;
 	}
 
 	if (date.getDate() == new Date().getDate() - 1) {

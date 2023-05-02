@@ -46,17 +46,11 @@ const BoardProvider = memo(({ children }: BoardProviderProps) => {
 
 	const updateColumn = async (column: ColumnModel) => {
 		await window.api.updateColumn({
-			// ...column,
 			id: column.id,
 			title: column.title,
 			orderIndex: column.orderIndex,
 			boardId: selectedBoard!.id,
 		});
-		/* const updateColumn = {
-			id: column.id,
-			title: column.title,
-		}; */
-		// await window.api.updateColumn(updateColumn);
 	};
 
 	const loadColumn = async (column: ColumnModel) => {
@@ -84,10 +78,11 @@ const BoardProvider = memo(({ children }: BoardProviderProps) => {
 		});
 	};
 
-	const updateTask = async (column: ColumnModel, task: TaskModel) => {
+	const updateTask = async (columnId: string, task: TaskModel) => {
+		const column = selectedBoard!.columns.find((c) => c.id === columnId);
+		if (!column) return;
 		const updateTask = {
-			id: task.id,
-			orderIndex: task.orderIndex,
+			...task,
 			columnId: column.id,
 		};
 
@@ -105,14 +100,12 @@ const BoardProvider = memo(({ children }: BoardProviderProps) => {
 
 		const resCol: ColumnModel = await window.api.createColumn(column);
 
-
 		const newBoard: BoardModel = {
 			...selectedBoard,
 			columns: [...selectedBoard.columns, resCol],
 		};
 
 		loadBoard(newBoard);
-
 	};
 
 	const createTask = async (columnId: string, title: string) => {

@@ -47,7 +47,7 @@ const Board = () => {
 		await loadColumn(newCol);
 
 		for (const t of newTasks) {
-			await updateTask(col, {
+			await updateTask(col.id, {
 				...t,
 				orderIndex: newTasks.indexOf(t),
 			});
@@ -79,14 +79,14 @@ const Board = () => {
 		await loadColumn(newEndCol);
 
 		for (const t of startColTasks) {
-			await updateTask(newStartCol, {
+			await updateTask(newStartCol.id, {
 				...t,
 				orderIndex: startColTasks.indexOf(t),
 			});
 		}
 
 		for (const t of endColTasks) {
-			await updateTask(newEndCol, {
+			await updateTask(newEndCol.id, {
 				...t,
 				orderIndex: endColTasks.indexOf(t),
 			});
@@ -172,7 +172,7 @@ const Board = () => {
 				<h1 className="text-xl font-bold text-slate-100">
 					{selectedBoard?.title}
 				</h1>
-				<SecondaryButton className="text-xs">
+				<SecondaryButton onClick={() => {}} className="text-xs">
 					<FontAwesomeIcon icon={faThumbtack} />
 				</SecondaryButton>
 			</div>
