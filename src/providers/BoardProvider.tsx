@@ -36,13 +36,22 @@ const BoardProvider = memo(({ children }: BoardProviderProps) => {
 			...board,
 			orderIndex,
 		});
-		setBoards((prev) =>
-			prev.map((b) => (b.id === resBoard.id ? resBoard : b))
-		);
-		setSelectedBoard(resBoard);
+		loadBoard(resBoard);
+	};
+
+	const loadBoard = async (board: BoardModel) => {
+		setBoards((prev) => prev.map((b) => (b.id === board.id ? board : b)));
+		setSelectedBoard(board);
 	};
 
 	const updateColumn = async (column: ColumnModel) => {
+		await window.api.updateColumn({
+			// ...column,
+			id: column.id,
+			title: column.title,
+			orderIndex: column.orderIndex,
+			boardId: selectedBoard!.id,
+		});
 		/* const updateColumn = {
 			id: column.id,
 			title: column.title,
@@ -96,23 +105,14 @@ const BoardProvider = memo(({ children }: BoardProviderProps) => {
 
 		const resCol: ColumnModel = await window.api.createColumn(column);
 
-		console.log(resCol);
 
-		setBoards((prev) =>
-			prev.map((b) =>
-				b.id === selectedBoard.id
-					? { ...b, columns: [...b.columns, resCol] }
-					: b
-			)
-		);
+		const newBoard: BoardModel = {
+			...selectedBoard,
+			columns: [...selectedBoard.columns, resCol],
+		};
 
-		setSelectedBoard((prev) => {
-			if (!prev) return null;
-			return {
-				...prev,
-				columns: [...prev.columns, resCol],
-			};
-		});
+		loadBoard(newBoard);
+
 	};
 
 	const createTask = async (columnId: string, title: string) => {
@@ -122,11 +122,18 @@ const BoardProvider = memo(({ children }: BoardProviderProps) => {
 		);
 		if (!targetColumn) return;
 		const taskIndex = targetColumn.tasks.length || 0;
-		await window.api.createTask({
+		const resTask: TaskModel = await window.api.createTask({
 			title,
 			orderIndex: taskIndex,
 			columnId,
 		});
+
+		const newColumn: ColumnModel = {
+			...targetColumn,
+			tasks: [...targetColumn.tasks, resTask],
+		};
+
+		loadColumn(newColumn);
 	};
 
 	useEffect(() => {
@@ -151,6 +158,7 @@ const BoardProvider = memo(({ children }: BoardProviderProps) => {
 				updateColumn,
 				updateTask,
 				loadColumn,
+				loadBoard,
 			}}
 		>
 			{children}

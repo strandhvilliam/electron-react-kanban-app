@@ -1,5 +1,5 @@
 import { ColumnModel } from "@/shared/types";
-import { useContext } from "react";
+import { useContext, useRef, useState } from "react";
 import Task from "./Task";
 import { Draggable } from "react-beautiful-dnd";
 import { StrictModeDroppable as Droppable } from "@/utils/StrictModeDroppable";
@@ -13,6 +13,7 @@ import IconButton from "./IconButton";
 import Tag from "./Tag";
 import OutlineButton from "./OutlineButton";
 import BoardContext from "@/providers/board-context";
+import { createPortal } from "react-dom";
 
 interface ColumnProps {
 	// column: ColumnModel;
@@ -21,12 +22,39 @@ interface ColumnProps {
 }
 
 const Column = ({ column, index }: ColumnProps) => {
-	const { createTask, selectedBoard } = useContext(BoardContext);
+	const { createTask, selectedBoard, updateColumn, loadColumn } =
+		useContext(BoardContext);
+	const [isEditingTitle, setIsEditingTitle] = useState(false);
+	const [title, setTitle] = useState(column.title);
+	// const inputRef = useRef<HTMLInputElement>(null);
 
 	// const column = selectedBoard?.columns.find((c) => c.id === id);
 
+	const toggleEditTitle = () => {
+		// document.addEventListener("click", handleOutsideClick, false);
+		setIsEditingTitle(true);
+	};
+
+	/* const handleOutsideClick = (e: MouseEvent) => {
+		if (inputRef.current && inputRef.current.contains(e.target as Node)) {
+			return;
+		}
+		handleEditTitle();
+		setIsEditingTitle(false);
+		document.removeEventListener("click", handleOutsideClick, false);
+	}; */
+
 	const handleCreateTask = async (input: string) => {
 		createTask(column.id, input);
+	};
+
+	const handleEditTitle = () => {
+		loadColumn({ ...column, title });
+
+		if (title !== column.title) {
+			updateColumn({ ...column, title });
+		}
+		setIsEditingTitle(false);
 	};
 
 	return (
@@ -39,11 +67,26 @@ const Column = ({ column, index }: ColumnProps) => {
 				>
 					<div
 						{...provided.dragHandleProps}
+						onDoubleClick={toggleEditTitle}
 						className="flex items-center justify-between px-4 p-3 select-none"
 					>
-						<h2 className="text-slate-100 text-xl ">
-							{column.title}
-						</h2>
+						{!isEditingTitle ? (
+							<>
+								<h2 className="text-slate-100 text-xl ">
+									{column.title}
+								</h2>
+							</>
+						) : (
+							<input
+								type="text"
+								autoFocus
+								className="text-slate-100 text-xl bg-slate-900 outline-0"
+								value={title}
+								onChange={(e) => setTitle(e.target.value)}
+								onBlur={handleEditTitle}
+								onKeyDown={(e) => {e.key == "Enter" && handleEditTitle()}}
+							/>
+						)}
 						<IconButton className="shadow-none bg-slate-900 hover:bg-slate-800">
 							<FontAwesomeIcon icon={faEllipsis} />
 						</IconButton>

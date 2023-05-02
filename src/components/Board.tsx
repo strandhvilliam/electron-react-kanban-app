@@ -15,13 +15,13 @@ import { ColumnModel, TaskModel } from "@/shared/types";
 
 const Board = () => {
 	const {
-		selectBoard,
 		selectedBoard,
 		createColumn,
-		updateBoard,
-		updateColumn,
 		updateTask,
+		updateColumn,
+		updateBoard,
 		loadColumn,
+		loadBoard,
 	} = useContext(BoardContext);
 
 	const handleCreateColumn = (input: string) => {
@@ -106,6 +106,30 @@ const Board = () => {
 			return;
 
 		if (type === "column") {
+			const newColumns = Array.from(selectedBoard.columns);
+
+			newColumns.splice(source.index, 1);
+			newColumns.splice(
+				destination.index,
+				0,
+				selectedBoard.columns[source.index]
+			);
+
+			const newBoard = {
+				...selectedBoard,
+				columns: newColumns,
+			};
+
+			await loadBoard(newBoard);
+
+			for (const c of newColumns) {
+				const index = newBoard.columns.indexOf(c);
+				const newCol = {
+					...c,
+					orderIndex: index,
+				};
+				await updateColumn(newCol);
+			}
 		}
 
 		if (type === "task") {

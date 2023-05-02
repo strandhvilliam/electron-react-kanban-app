@@ -12,7 +12,7 @@ export interface ColumnModel {
 	id: string;
 	title: string;
 	tasks: TaskModel[];
-	// orderIndex: number;
+	orderIndex: number;
 	createdAt: Date;
 	updatedAt: Date;
 }

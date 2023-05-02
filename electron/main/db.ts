@@ -118,6 +118,8 @@ export const updateBoard = async (board: UpdateBoard) => {
 };
 
 export const updateColumn = async (column: UpdateColumn) => {
+	console.log("updateColumn", column);
+
 	await prisma.column.update({
 		where: { id: column.id },
 		data: {
