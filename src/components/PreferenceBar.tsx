@@ -12,7 +12,7 @@ interface PreferenceBarProps {
 
 const PreferenceBar = ({ toggleList }: PreferenceBarProps) => {
 	return (
-		<div className="flex px-3 py-2 flex-col max-w-xs items-center justify-between border-r border-slate-700">
+		<div className="pt-8  flex-shrink-0 w-16 flex px-8 py-2 flex-col items-center justify-between border-r  border-slate-700 bg-slate-950">
 			<ul className="flex flex-col space-y-4 text-slate-400 text-xl text-center">
 				<li className=" hover:text-slate-200" onClick={toggleList}>
 					<FontAwesomeIcon icon={faRectangleList} />

@@ -15,7 +15,14 @@ import {
 	updateTask,
 } from "./db";
 import path from "path";
-import { CreateBoard, CreateColumn, CreateTask, UpdateBoard, UpdateColumn, UpdateTask } from "electron/types";
+import {
+	CreateBoard,
+	CreateColumn,
+	CreateTask,
+	UpdateBoard,
+	UpdateColumn,
+	UpdateTask,
+} from "electron/types";
 
 // The built directory structure
 //
@@ -61,6 +68,9 @@ async function createWindow() {
 		icon: join(process.env.PUBLIC, "favicon.ico"),
 		width: 1200,
 		height: 800,
+		titleBarStyle: "hidden",
+		trafficLightPosition: { x: 6, y: 6 },
+
 		webPreferences: {
 			preload,
 			// Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
@@ -161,7 +171,7 @@ ipcMain.handle(
 ipcMain.handle(
 	"update-board",
 	async (_, board: UpdateBoard) => await updateBoard(board)
-)
+);
 
 ipcMain.handle(
 	"update-column",

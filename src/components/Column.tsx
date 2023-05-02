@@ -14,9 +14,9 @@ import Tag from "./Tag";
 import OutlineButton from "./OutlineButton";
 import BoardContext from "@/providers/board-context";
 import { createPortal } from "react-dom";
+import useOutsideClick from "@/hooks/useOutsideClick";
 
 interface ColumnProps {
-	// column: ColumnModel;
 	column: ColumnModel;
 	index: number;
 }
@@ -26,11 +26,10 @@ const Column = ({ column, index }: ColumnProps) => {
 		useContext(BoardContext);
 	const [isEditingTitle, setIsEditingTitle] = useState(false);
 	const [title, setTitle] = useState(column.title);
+	const [menuIsOpen, setMenuIsOpen] = useState(false);
 
-	const toggleEditTitle = () => {
-		setIsEditingTitle(true);
-	};
-
+	const menuRef = useRef<HTMLDivElement>(null);
+	const menuBtnRef = useRef<HTMLButtonElement>(null);
 
 	const handleCreateTask = async (input: string) => {
 		createTask(column.id, input);
@@ -45,17 +44,19 @@ const Column = ({ column, index }: ColumnProps) => {
 		setIsEditingTitle(false);
 	};
 
+	useOutsideClick([menuRef, menuBtnRef], () => setMenuIsOpen(false));
+
 	return (
 		<Draggable draggableId={column.id} index={index}>
 			{(provided, snapshot) => (
 				<div
 					{...provided.draggableProps}
 					ref={provided.innerRef}
-					className="flex relative max-h-full flex-col w-80 overflow-hidden pb-16 shadow-md shadow-slate-950 bg-slate-900 border border-slate-700 rounded-xl mx-4 "
+					className="flex relative max-h-full flex-col w-80  pb-16 shadow-md shadow-slate-950 bg-slate-900 border border-slate-700 rounded-xl mx-4 "
 				>
 					<div
 						{...provided.dragHandleProps}
-						onDoubleClick={toggleEditTitle}
+						onDoubleClick={() => setIsEditingTitle(true)}
 						className="flex items-center justify-between px-4 p-3 select-none"
 					>
 						{!isEditingTitle ? (
@@ -72,13 +73,81 @@ const Column = ({ column, index }: ColumnProps) => {
 								value={title}
 								onChange={(e) => setTitle(e.target.value)}
 								onBlur={handleEditTitle}
-								onKeyDown={(e) => {e.key == "Enter" && handleEditTitle()}}
+								onKeyDown={(e) => {
+									e.key == "Enter" && handleEditTitle();
+								}}
 							/>
 						)}
-						<IconButton onClick={() => {}} className="shadow-none bg-slate-900 hover:bg-slate-800">
+						<IconButton
+							onClick={() => setMenuIsOpen(!menuIsOpen)}
+							ref={menuBtnRef}
+							className="shadow-none bg-slate-900 hover:bg-slate-800"
+						>
 							<FontAwesomeIcon icon={faEllipsis} />
 						</IconButton>
 					</div>
+					{menuIsOpen && (
+						<div
+							ref={menuRef}
+							className="flex flex-col absolute top-10 w-max left-[280px] bg-slate-900 border border-slate-700 text-slate-300 py-4 z-40 rounded-lg shadow-md shadow-slate-900"
+						>
+							<ul>
+								<li className="px-4 py-1 hover:bg-slate-800 select-none cursor-default">
+									Add new Task
+								</li>
+								<li className="px-4 py-1 hover:bg-slate-800 select-none cursor-default">
+									Edit task
+								</li>
+
+								<li className="px-4 py-1 hover:bg-slate-800 select-none cursor-default">
+									Delete
+								</li>
+							</ul>
+							<p className="border-t px-4 py-2 mt-2 text-slate-500 text-sm font-bold border-slate-700">
+								Sort
+							</p>
+							<ul>
+								<li className="px-4 py-1 hover:bg-slate-800 select-none cursor-default">
+									Sort by date
+								</li>
+								<li className="px-4 py-1 hover:bg-slate-800 select-none cursor-default">
+									Sort by category
+								</li>
+								<li className="px-4 py-1 hover:bg-slate-800 select-none cursor-default">
+									Sort by priority
+								</li>
+								<li className="px-4 py-1 hover:bg-slate-800 select-none cursor-default">
+									Sort alpabetically
+								</li>
+							</ul>
+							<p className="border-t py-2 px-4 mt-2 text-slate-500 text-sm font-bold border-slate-700">
+								Filter
+							</p>
+							<ul>
+								<li className="flex items-center gap-2 px-4 py-1 hover:bg-slate-800 select-none cursor-default">
+									<img
+										className="w-4 h-4"
+										src="/fire.png"
+									></img>
+									Show only priority High
+								</li>
+								<li className="flex items-center gap-2 px-4 py-1 hover:bg-slate-800 select-none cursor-default">
+									<img
+										className="w-4 h-4"
+										src="/moon.png"
+									></img>
+									Show only priority Standard
+								</li>
+								<li className="flex items-center gap-2 px-4 py-1 hover:bg-slate-800 select-none cursor-default">
+									<img
+										className="w-4 h-4"
+										src="/leaf.png"
+									></img>
+									Show only priority Low
+								</li>
+							</ul>
+						</div>
+					)}
 
 					<Droppable droppableId={column.id} type="task">
 						{(provided, snapshot) => (

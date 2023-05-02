@@ -1,11 +1,12 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import SecondaryButton from "./IconButton";
+import IconButton from "./IconButton";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { createPortal } from "react-dom";
 import { useContext, useRef, useState } from "react";
 import Modal from "./Modal";
 import BoardContext from "@/providers/board-context";
 import { BoardModel } from "@/shared/types";
+import PrimaryButton from "./PrimaryButton";
 
 interface BoardNavProps {
 	visible: boolean;
@@ -36,17 +37,17 @@ const BoardNav = ({ visible }: BoardNavProps) => {
 	};
 
 	return visible ? (
-		<div className=" flex flex-col flex-shrink-0 border-r border-slate-700 w-44 select-none">
-			<div className="flex px-4 h-12 items-center justify-between border-b border-slate-700">
+		<div className="mt-1 flex flex-col flex-shrink-0 border-r border-slate-700 w-44 select-none bg-slate-950">
+			<div className="flex px-4 h-12 items-center justify-between border-b border-slate-700 ">
 				<h1 className=" font-bold text-slate-200  cursor-default">
 					Boards
 				</h1>
-				<SecondaryButton
+				<IconButton
 					onClick={showModal}
 					className="w-6 h-6 text-slate-200 text-xs "
 				>
 					<FontAwesomeIcon className="w-full" icon={faPlus} />
-				</SecondaryButton>
+				</IconButton>
 			</div>
 
 			<ul className="flex flex-col   text-slate-200">
@@ -87,12 +88,12 @@ const BoardNav = ({ visible }: BoardNavProps) => {
 							>
 								Cancel
 							</button>
-							<button
+							<PrimaryButton
 								onClick={handleCreateBoard}
 								className="px-3 py-1 rounded-md bg-indigo-700 shadow-sm shadow-slate-900 text-slate-200 text-sm hover:bg-indigo-600"
 							>
 								Create
-							</button>
+							</PrimaryButton>
 						</div>
 					</Modal>,
 					document.body

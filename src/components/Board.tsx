@@ -167,7 +167,7 @@ const Board = () => {
 	};
 
 	return (
-		<div className="w-full min-h-full max-h-full flex flex-col overflow-hidden">
+		<div className="mt-1 w-full min-h-full max-h-full flex flex-col overflow-hidden  border-slate-700">
 			<div className="flex h-12 p-4 space-x-4 items-center px-4 border-b border-slate-700">
 				<h1 className="text-xl font-bold text-slate-100">
 					{selectedBoard?.title}
